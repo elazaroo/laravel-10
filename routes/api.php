@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\loginController;
 use App\Http\Controllers\pokemonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,3 +34,8 @@ Route::get('/getPokemons', [pokemonController::class, 'getPokemons']);
 Route::get('/getPokemon/{id}', [pokemonController::class, 'getPokemon']);
 
 Route::post('/getPokemonName', [pokemonController::class, 'getPokemonName']);
+
+Route::post('/getPokemonEvoInvo', [pokemonController::class, 'apiPokemonEvoInvo']);
+
+// USER
+Route::get('/getUserByToken/{token}', [loginController::class, 'apiRememberToken']);

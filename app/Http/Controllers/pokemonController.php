@@ -49,6 +49,45 @@ class pokemonController extends Controller
         }
     }
 
+    public function apiPokemonEvoInvo(Request $request)
+    {
+        // $request debet tener id, name e image
+        $id = $request->id;
+        $name = $request->name;
+        $image = $request->image;
+
+        $validRequest = Pokemons::where('id', $id)->where('name', $name)->where('image', $image)->first();
+        if (!$validRequest) {
+            return Response::json(array('code' => 400, 'status' => false, 'message' => "No se ha encontrado el pokemon"), 404);
+        } else {
+            $familyId = Evolution::where('pokemons_id', $id)->first()->family;
+            $pokemonPostion = Evolution::where('pokemons_id', $id)->first()->position;
+            $invoIds = Evolution::where('family', $familyId)
+                ->where('position', '<', $pokemonPostion)
+                ->pluck('pokemons_id')
+                ->toArray();
+
+            $evoIds = Evolution::where('family', $familyId)
+                ->where('position', '>', $pokemonPostion)
+                ->pluck('pokemons_id')
+                ->toArray();
+
+            $invoData = Pokemons::whereIn('id', $invoIds)->get(['id', 'name']);
+            $evoData = Pokemons::whereIn('id', $evoIds)->get(['id', 'name']);
+
+            if ($invoData->isEmpty() && $evoData->isEmpty()) {
+                return Response::json(array('code' => 404, 'status' => false, 'message' => "No se han encontrado evoluciones o involuciones"), 404);
+            } else {
+                if ($invoData == null) {
+                    return Response::json(array('code' => 200, 'status' => true, 'message' => "ok", 'evolutions' => $evoData), 200);
+                } elseif ($evoData == null) {
+                    return Response::json(array('code' => 200, 'status' => true, 'message' => "ok", 'involutions' => $invoData), 200);
+                } else {
+                    return Response::json(array('code' => 200, 'status' => true, 'message' => "ok", 'involutions' => $invoData, 'evolutions' => $evoData), 200);
+                }
+            }
+        }
+    }
 
     public function index()
     {
