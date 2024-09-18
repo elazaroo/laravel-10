@@ -31,7 +31,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Instala las dependencias de la aplicación con más detalles de depuración
-RUN composer install --no-dev --optimize-autoloader --verbose
+RUN composer install --no-dev --optimize-autoloader --verbose || true
 
 # Copia el resto del código de la aplicación
 COPY . .
