@@ -32,5 +32,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Exponer el puerto 80
 EXPOSE 80
 
+
 # Comando para iniciar Apache
 CMD ["apache2-foreground"]
