@@ -1,5 +1,5 @@
-# Usa una imagen base con PHP y las extensiones necesarias
-FROM php:8.1-fpm
+# Usa una imagen base con PHP 8.2 y las extensiones necesarias
+FROM php:8.2-fpm
 
 # Instala dependencias del sistema
 RUN apt-get update && apt-get install -y \
