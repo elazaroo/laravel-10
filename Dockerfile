@@ -2,16 +2,21 @@
 FROM php:8.1-fpm
 
 # Instala dependencias del sistema
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libicu-dev libxml2-dev git unzip libzip-dev
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libxml2-dev \
+    git \
+    unzip \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
-    && docker-php-ext-intl \
-    && docker-php-ext-mbstring \
-    && docker-php-ext-soap \
-    && docker-php-ext-sodium \
-    && docker-php-ext-zip
+    && docker-php-ext-install intl mbstring soap sodium zip
 
 # Configura el directorio de trabajo
 WORKDIR /var/www/html
