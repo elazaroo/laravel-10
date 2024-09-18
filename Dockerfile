@@ -1,60 +1,36 @@
-# Usa una imagen base con PHP 8.2 y las extensiones necesarias
-FROM php:8.2-fpm
+# Usar una imagen base de PHP con Apache
+FROM php:8.1-apache
 
-# Instala dependencias del sistema
+# Instalar extensiones necesarias para Laravel
 RUN apt-get update && apt-get install -y \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
-    libicu-dev \
-    libxml2-dev \
-    git \
-    unzip \
     libzip-dev \
-    libonig-dev \
-    libxslt-dev \
-    libsodium-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Instala extensiones de PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    zip \
+    unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
-    && docker-php-ext-install intl mbstring soap sodium zip
+    && docker-php-ext-install pdo pdo_mysql zip
 
-# Instala Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Habilitar el módulo de reescritura de Apache
+RUN a2enmod rewrite
 
-# Configura el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /var/www/html
 
-# Copia el archivo composer.json y composer.lock
-COPY composer.json composer.lock ./
+# Copiar los archivos de la aplicación al contenedor
+COPY . /var/www/html
 
-# Instala las dependencias de la aplicación con más detalles de depuración
-RUN composer install --no-dev --optimize-autoloader --verbose || true
+# Instalar las dependencias de Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-dev --optimize-autoloader
 
-# Copia el resto del código de la aplicación
-COPY . .
+# Configurar permisos adecuados
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Establece permisos adecuados para los archivos
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Exponer el puerto 80
+EXPOSE 80
 
-# Copia el archivo de entorno de producción
-COPY .env.example .env
-
-# Genera la clave de la aplicación
-RUN php artisan key:generate
-
-# Configura las variables de entorno necesarias
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV APP_KEY=base64:GENERATED_APP_KEY
-ENV APP_URL=http://localhost
-
-# Expone el puerto en el que se ejecutará la aplicación
-EXPOSE 9000
-
-# Comando para iniciar PHP-FPM
-CMD ["php-fpm"]
+# Comando para iniciar Apache
+CMD ["apache2-foreground"]
