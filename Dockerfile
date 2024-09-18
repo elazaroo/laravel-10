@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libzip-dev \
+    libonig-dev \
+    libxslt-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala extensiones de PHP
@@ -28,7 +30,24 @@ COPY . .
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Instala las dependencias de la aplicación
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader
+
+# Establece permisos adecuados para los archivos
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
+
+# Copia el archivo de entorno de producción
+COPY .env.example .env
+
+# Genera la clave de la aplicación
+RUN php artisan key:generate
+
+# Configura las variables de entorno necesarias
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+ENV APP_KEY=base64:GENERATED_APP_KEY
+ENV APP_URL=http://localhost
 
 # Expone el puerto en el que se ejecutará la aplicación
 EXPOSE 9000
