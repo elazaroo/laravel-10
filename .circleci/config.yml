@@ -35,13 +35,16 @@ jobs:
           name: run tests
           command: ./vendor/bin/phpunit
   deploy:
-    # This is an example deploy job, not actually used by the workflow
+    # Deploy job
     docker:
-      - image: cimg/base:stable
+      - image: cimg/php:8.2-node
     steps:
-      # Replace this with steps to deploy to users
+      - checkout
       - run:
-          name: deploy
+          name: Update Composer Dependencies
+          command: composer update --no-interaction --prefer-dist
+      - run:
+          name: Deploy
           command: '#e.g. ./deploy.sh'
 workflows:
   build-and-test:
