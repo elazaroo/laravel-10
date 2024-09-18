@@ -21,17 +21,20 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
     && docker-php-ext-install intl mbstring soap sodium zip
 
-# Configura el directorio de trabajo
-WORKDIR /var/www/html
-
-# Copia el código de la aplicación
-COPY . .
-
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Configura el directorio de trabajo
+WORKDIR /var/www/html
+
+# Copia el archivo composer.json y composer.lock
+COPY composer.json composer.lock ./
+
 # Instala las dependencias de la aplicación
 RUN composer install --no-dev --optimize-autoloader
+
+# Copia el resto del código de la aplicación
+COPY . .
 
 # Establece permisos adecuados para los archivos
 RUN chown -R www-data:www-data /var/www/html \
