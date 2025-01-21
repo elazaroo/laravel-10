@@ -1,5 +1,6 @@
 {
     "version": 2,
+    "framework": null,
     "functions": {
         "api/index.php": { "runtime": "vercel-php@latest" }
     },
@@ -24,14 +25,5 @@
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
-    },
-    "builds": [
-        {
-            "src": "build.sh",
-            "use": "@vercel/static-build"
-        }
-    ],
-    "scripts": {
-        "build": "./build.sh"
     }
 }
