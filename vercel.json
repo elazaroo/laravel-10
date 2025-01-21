@@ -2,11 +2,9 @@
     "version": 2,
     "framework": null,
     "functions": {
-        "api/index.php": { "runtime": "vercel-php@0.6.0" },
-        "config": {
-            "installCommand": "apt-get update && apt-get install -y libssl1.0.0 && composer install --no-dev --optimize-autoloader"
-        }
+        "api/index.php": { "runtime": "vercel-php@0.6.0" }
     },
+    "installCommand": "apt-get update && apt-get install -y libssl1.0.0 && composer install --no-dev --optimize-autoloader",
     "routes": [
         {
             "src": "/(.*)",
